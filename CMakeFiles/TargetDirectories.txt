@@ -1,0 +1,6 @@
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise01.dir
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise02.dir
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise03.dir
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise04a.dir
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise04b.dir
+/homes/wy1713/graphics_2016/CMakeFiles/cgExercise05.dir

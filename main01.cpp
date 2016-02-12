@@ -62,6 +62,9 @@ float move_x = 0.0, move_y = 0.0;
 unsigned int win_width = 128, win_height = 128;
 float translate_z = 0.0;
 unsigned int frameCaptured = 0;
+
+//new declarations
+bool leftDown = false, rightDown = false, middleDown = false;
 /////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
@@ -81,10 +84,15 @@ void renderScene(void)
   glPushMatrix();
 
   glLightfv(GL_LIGHT0, GL_POSITION, lpos);
-  /////////////////////////////////////////////////
-  //TODO add scene interaction code here
 
-  /////////////////////////////////////////////////
+  //move in xy-plane
+  glTranslatef(move_x, move_y, 0.0);
+  //zoom with vertical movement
+  glTranslatef(0.0, 0.0, translate_z);
+  //rotate object on x-axis,y-axis
+  glRotatef(rotate_x, 1.0, 0.0, 0.0);
+  glRotatef(rotate_y, 0.0, 1.0, 0.0);
+
   GL_CHECK(glUseProgram(p));
   glutSolidTeapot(0.5);
   GL_CHECK(glUseProgram(0));
@@ -108,27 +116,28 @@ void renderScene(void)
 ///////////////////////////////////////////////////////////////////////
 // mouse interaction functions
 void mouseClick(int button, int state, int x, int y)
-{
-  /////////////////////////////////////////////////
-  // TODO add code to handle mouse click events
-  // use GLUT_UP and GLUT_DOWN to evaluate the current
-  // "state" of the mouse.
-  /////////////////////////////////////////////////
-
-
-  /////////////////////////////////////////////////
+{	
+	mouse_old_x = x;
+	mouse_old_y = y;
+	if (state == GLUT_DOWN) {
+		mouse_buttons = button;
+	}
 }
 
 void mouseMotion(int x, int y)
 {
-  /////////////////////////////////////////////////
-  // TODO add code to handle mouse move events
-  // and calculate reasonable values for object
-  // rotations
-  /////////////////////////////////////////////////
-
-
-  /////////////////////////////////////////////////
+	if (mouse_buttons == GLUT_LEFT_BUTTON) {
+		//move vertically(y changes) rotate on x-axis, vice versa 
+		rotate_x += ((float)(y - mouse_old_y)) * 0.1;
+		rotate_y += ((float)(x - mouse_old_x)) * 0.1;
+	} else if (mouse_buttons == GLUT_RIGHT_BUTTON) {
+		translate_z += (float)(y - mouse_old_y) * 0.01;
+	} else if (mouse_buttons == GLUT_MIDDLE_BUTTON) {
+		move_x += (float)(x - mouse_old_x)/(float)win_width * 0.3;
+		move_y += (float)(mouse_old_y - y)/(float)win_height * 0.3;
+	}
+	mouse_old_x = x;
+	mouse_old_y = y;
 }
 
 

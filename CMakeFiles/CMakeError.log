@@ -1,0 +1,53 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1808462014/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1808462014.dir/build.make CMakeFiles/cmTryCompileExec1808462014.dir/build
+make[1]: Entering directory `/homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1808462014.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec1808462014.dir/CheckSymbolExists.c.o   -c /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec1808462014
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1808462014.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec1808462014.dir/CheckSymbolExists.c.o  -o cmTryCompileExec1808462014 -rdynamic 
+CMakeFiles/cmTryCompileExec1808462014.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec1808462014] Error 1
+make[1]: Leaving directory `/homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec1808462014/fast] Error 2
+
+File /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec739988760/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec739988760.dir/build.make CMakeFiles/cmTryCompileExec739988760.dir/build
+make[1]: Entering directory `/homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec739988760.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec739988760.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec739988760
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec739988760.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec739988760.dir/CheckFunctionExists.c.o  -o cmTryCompileExec739988760 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec739988760] Error 1
+make[1]: Leaving directory `/homes/wy1713/graphics_2016/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec739988760/fast] Error 2
+
+

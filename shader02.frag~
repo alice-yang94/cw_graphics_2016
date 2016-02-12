@@ -51,7 +51,7 @@ void main()
     // l is direction to light source from frag 
     vec3 l = normalize(vec3(lightSource - frag.pos));
     vec3 n = normalize(frag.normal);
-    float i_f = max(dot(l,n),0);
+    float i_f = dot(l,n);
     if (i_f > 0.98) {
       outcol = vec4(0.8, 0.8, 0.8, 1.0);
     } else if (i_f > 0.5 && i_f <= 0.98) {
