@@ -68,7 +68,7 @@ void produceVertex(float s, float t, vec4 v0, vec4 v01, vec4 v02, vec3 n0, vec3 
               + t * v02;
               
   /*Animation
-  gl_Position += frag.normal*(abs(rnd(frag.vpos)))*time*0.01; 
+  gl_Position += frag.normal*(abs(rnd(frag.vpos.xy)))*time*0.01; 
   */
   EmitVertex();
 }
