@@ -15,6 +15,16 @@ uniform mat4 modelViewMatrix;
 
 const int raytraceDepth = 42;
 const int numSpheres = 6;
+const vec3 light_position = vec3(2,3,4);
+
+const float CONSTANT_ATTENUTAION = 0.5;
+const float LINEAR_ATTENUTAION = 0.4;
+const float QUADRATIC_ATTENUATION = 0.3;
+const int LIGHT_INTENSITY = 10;
+const int SPECULAR_EXPONENT = 25;
+const float epsilon = 0.00001;
+const float reflectivity = 0.4;
+const float ambient_factor = 0.2;
 
 struct Ray
 {
@@ -54,25 +64,79 @@ struct Intersection
 
 void shpere_intersect(Sphere sph, Ray ray, inout Intersection intersect)
 {
-  ////////////////////////////////////////////////////////////////////
-  // TODO 
-  ////////////////////////////////////////////////////////////////////
+  vec3 p0 = ray.origin;
+  vec3 ps = sph.centre;
+  vec3 dp = p0 - ps;
+
+  vec3 d = ray.dir;
+
+  vec3 r = sph.radius;
+
+  float quad_eq = pow(dot(d,dp),2) - pow(dp,2) + pow(r,2);
+
+  //quad_eq > 0 means there are two solutions, intersection exists
+  if (quad_eq > 0) {
+    float base = -dot(d,dp); 
+    float enter_factor = max(base - sqrt(quad_eq), 0);
+
+    if (enter_factor > 0 && (enter_factor < intersect.t || intersect.hit == 0)) {
+      
+      intersect.t = enter_factor;
+      intersect.point = p0 + (enter_factor * d);
+      intersect.normal = normalize(intersect.point - ps);
+      intersect.hit = 1;
+      intersect.colour = sph.colour;
+    }
+  }
+
+   
 }
 
 void plane_intersect(Plane pl, Ray ray, inout Intersection intersect)
 {
-  ////////////////////////////////////////////////////////////////////
-  // TODO 
-  ////////////////////////////////////////////////////////////////////
+  vec3 p0 = ray.origin;
+  vec3 p1 = pl.point;
+  vec3 n = pl.normal;
+  vec3 d = ray.dir;
+
+  float bottom = dot(d,n);
+
+  if (bottom != 0) {
+
+    float intersect_factor = - dot(p0 - p1, n) / dot(d,n);
+
+    if (intersect_factor > 0 && (intersect_factor < intersect.t || intersect.hit == 0)) {
+      intersect.t = intersect_factor;
+      intersect.point = p0 + (intersect_factor * d);
+      intersect.normal = n;
+      intersect.hit = 1;
+ 
+      intersect.colour = pl.colour;
+      if (mod(floor(intersect.point.x), 2) == mod(floor(intersect.point.z), 2)) {
+        intersect.colour = vec3(0.5, 0.5, 0.5) 
+      }
+      
+    }
+
+  }
+
 }
 
 Sphere sphere[numSpheres];
 Plane plane;
+
+//iterate through all spheres and plane to find intersections
 void Intersect(Ray r, inout Intersection i)
 {
-  ////////////////////////////////////////////////////////////////////
-  // TODO 
-  ////////////////////////////////////////////////////////////////////
+  i.hit = 0;
+ 
+  for (int k; k < numSpheres; k++) {
+    sphere_intersect(sphere[k], r, i);
+  }
+  
+  plane_intersect(plane, r, i);
+  
+  return i;
 }
 
 int seed = 0;
@@ -82,14 +146,42 @@ float rnd()
   return float(seed)/509.0;
 }
 
+
+
 vec3 computeShadow(in Intersection intersect)
 {
-  ////////////////////////////////////////////////////////////////////
-  // TODO 
-  ////////////////////////////////////////////////////////////////////
+  float epsilon = 0.00001;
+  Intersection i;
+  i.hit = 0;
+  Ray shadow;
+  shadow.origin = intersect.point + epsilon * intersect.normal;
+  shadow.dir = normalize(light_position - shadow.origin);
+  Intersect(shadow, i);
+  
+  if (i.hit == 0) {
+    float d = distance(light_position - shadow.origin);
+    float attenuation = 1.0 / ( CONSTANT_ATTENUTAION
+      				+ LINEAR_ATTENUTAION * d
+      				+ QUADRATIC_ATTENUATION * d * d);
+
+    vec3 diffuseColour = intersect.colour;
+    vec3 i_d = LIGHT_INTENSITY * attenuation * diffuseColour * dot(intersect.normal, shadow.dir);
+
+    vec3 specularColour = intersect.colour;
+    
+
+    vec3 r = reflect(shadow.dir, intersect.normal);
+    vec3 e = normalize(main_ray.dir);
+
+    vec3 i_s = LIGHT_INTENSITY * attenuation * specularColour 
+			* pow(max(dot(r,e),0), SPECULAR_EXPONENT);
+    return i_d + i_s;
+  }
 
   return vec3(0,0,0);
 }
+
+Ray main_ray;
 
 void main()
 {
@@ -121,7 +213,25 @@ void main()
   //make empty for exercise 
   outcolour = vec4(1,1,1,1);
 
-  ////////////////////////////////////////////////////////////////////
-  // TODO 
-  ////////////////////////////////////////////////////////////////////
+
+  //support mouse based interaction
+  vec4 ray_origin = modelViewMatrix * vec4(origin.x, origin.y, origin.z, 1.0);
+  main_ray.origin = ray_origin.xyz / ray_origin.w;
+  main_ray.dir = normalize(vec4(dir.x, dir.y, dir.z, 1.0) * modelViewMatrix);
+
+  Intersaction i;
+
+  int currentDepth = 1;
+   
+  do {
+    Intersect(main_ray, i);
+    vec3 colour = ambient_factor * i.colour + computeShadow(i);
+    outcolour.xyz += colour * pow(reflectivity, currentDepth);
+    main_ray.origin = i.point + epsilon*i.normal;
+    main_ray.dir = reflect(main_ray.dir, i.normal);
+
+    currentDepth++;
+  } while (i.hit == 1 && currentDepth < raytraceDepth)
+
+
 }
